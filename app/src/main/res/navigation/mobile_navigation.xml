@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_status">
+
+
+    <fragment
+        android:id="@+id/nav_status"
+        android:name="com.minkai.lossweight_app.ui.status.StatusFragment"
+        android:label="@string/menu_status"
+        tools:layout="@layout/fragment_status" />
+
+
+    <fragment
+        android:id="@+id/nav_devices"
+        android:name="com.minkai.lossweight_app.ui.Devices.DevicesFragment"
+        android:label="@string/menu_devices"
+        tools:layout="@layout/fragment_devices" />
+
+
+    <fragment
+        android:id="@+id/nav_realtime_plot"
+        android:name="com.minkai.lossweight_app.ui.RealTimePlot.RealtimePlotFragment"
+        android:label="@string/menu_realtime_plot"
+        tools:layout="@layout/fragment_realtime_plot" />
+
+
+    <fragment
+        android:id="@+id/nav_data_debug"
+        android:name="com.minkai.lossweight_app.ui.DataReceive_Debug.DataReceiveDebugFragment"
+        android:label="@string/menu_data_debug"
+        tools:layout="@layout/fragment_data_debug" />
+
+    <fragment
+        android:id="@+id/nav_share"
+        android:name="com.minkai.lossweight_app.ui.share.ShareFragment"
+        android:label="@string/menu_share"
+        tools:layout="@layout/fragment_share" />
+
+    <fragment
+        android:id="@+id/nav_about"
+        android:name="com.minkai.lossweight_app.ui.About.AboutFragment"
+        android:label="@string/menu_about"
+        tools:layout="@layout/fragment_about" />
+</navigation>

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Smart Loss Weight Assistant</string>
+
+
+    //Nav Bar 字串
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Smart Loss weight Assistant</string>
+    <string name="nav_header_subtitle">智慧減肥助手</string>
+    <string name="nav_header_desc">選項</string>
+    <string name="action_settings">設定</string>
+    <string name="action_add_device">重新掃描</string>
+    <string name="menu_status">狀態</string>
+    <string name="menu_devices">藍芽裝置管理</string>
+    <string name="menu_realtime_plot">即時裝置音訊狀態</string>
+    <string name="menu_data_debug">資料接收狀態</string>
+    <string name="menu_share">分享我的健康狀態</string>
+    <string name="menu_about">關於</string>
+
+</resources>

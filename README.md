@@ -1,7 +1,7 @@
 # Smart Loss Weight APP Client
 *Designed by Minkai*
 
-This project is to connect a weight loss device. When wearing this device while eating, he will send the data transmitted by the weight loss device to this application, and perform digital signal processing and get satiety through machine learning.
+This project is to connect a weight loss device. When wearing this device while eating, it will send the data transmitted by the weight loss device to this application, and perform digital signal processing and get satiety through machine learning.
 
 This Application currently Provide following functions:
 
@@ -10,9 +10,9 @@ This Application currently Provide following functions:
 > 3. Plot sound wave which received from device
 > 4. Export RAW text data which received from device for analysis
 > 5. Show time ,received data count and sample rate
->  
+> 6. Sample Rate up to 4000sps with low missing rate
 
-Those functions might be provided
+Those functions may be provided in the future
 > 1. Running machine learning models 
 > 2. Estimate satiety
 > 3. Show Short-Time Fourier transfer graph

@@ -2,44 +2,36 @@ package com.minkai.lossweight_app;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import com.harrysoft.androidbluetoothserial.BluetoothManager;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationView;
-import com.harrysoft.androidbluetoothserial.BluetoothSerialDevice;
+import com.harrysoft.androidbluetoothserial.BluetoothManager;
 import com.harrysoft.androidbluetoothserial.SimpleBluetoothDeviceInterface;
 
-import androidx.drawerlayout.widget.DrawerLayout;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
-import android.os.Handler;
-import android.os.SystemClock;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.UUID;
+
+import app.akexorcist.bluetotohspp.library.BluetoothSPP;
+import app.akexorcist.bluetotohspp.library.BluetoothState;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.BLUETOOTH_ADMIN;
@@ -49,26 +41,21 @@ import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 public class MainActivity extends AppCompatActivity {
     private SimpleBluetoothDeviceInterface deviceInterface;
     private AppBarConfiguration mAppBarConfiguration;
-    private BluetoothSocket mBTSocket = null;
-    private Handler mHandler;
     // Our main handler that will receive callback notifications
     // bluetooth background worker thread to send and receive data
     private BluetoothAdapter mBTAdapter;
     // bi-directional client-to-client data path
-    private final static int MESSAGE_READ = 2;
-    private static final UUID BTMODULEUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB"); // "random" unique identifier
+
     // #defines for identifying shared types between calling functions
     public final static int REQUEST_ENABLE_BT = 1;
     // used to identify adding bluetooth names
     // used in bluetooth handler to identify message update
-    private final static int CONNECTING_STATUS = 3;
-    // used in bluetooth handler to identify message status
-    private  String _recieveData = "";
     public BluetoothManager bluetoothManager;
     public BluetoothAdapter bluetoothAdapter;
     public int receivedSize;
     public ArrayAdapter<String> mBTArrayAdapter;
     public ArrayList<String> ReceiveData = new ArrayList();
+    BluetoothSPP bt = new BluetoothSPP(this);
     //private ConnectedThread mConnectedThread;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,9 +67,6 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
-
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.nav_status, R.id.nav_devices, R.id.nav_realtime_plot, R.id.nav_data_debug,
                  R.id.nav_share, R.id.nav_about)
@@ -92,69 +76,8 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-
-        bluetoothManager= BluetoothManager.getInstance();
-        mBTAdapter = BluetoothAdapter.getDefaultAdapter();
-
-
-
         mBTArrayAdapter = new ArrayAdapter<String> (getApplicationContext(),android.R.layout.simple_list_item_1);
 
-//            mHandler = new Handler(){
-//                public void handleMessage(android.os.Message msg){
-//                    if(msg.what == MESSAGE_READ){ //收到MESSAGE_READ 開始接收資料
-//                        String readMessage = null;
-//
-//                            byte[] received=(byte[])msg.obj;
-//                            readMessage = new String(String.valueOf(uint16((byte) received[1],(byte) received[0])));
-//
-//                            //readMessage =  readMessage.substring(0,1);
-//                            //取得傳過來字串的第一個字元，其餘為雜訊
-//                            //_recieveData += readMessage; //拼湊每次收到的字元成字串
-//
-//                        Toast.makeText(getApplicationContext(), readMessage, Toast.LENGTH_LONG).show();
-//
-//                    }
-//
-//                    if(msg.what == CONNECTING_STATUS){
-//                        //收到CONNECTING_STATUS 顯示以下訊息
-//                        if(msg.arg1 == 1)
-//                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
-//
-//                        else
-//                            Toast.makeText(getApplicationContext(),"Failed", Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//            };
-//        mHandler = new Handler(){
-//            public void handleMessage(android.os.Message msg){
-//                if(msg.what == MESSAGE_READ){ //收到MESSAGE_READ 開始接收資料
-//                    String readMessage = null;
-//                    try {
-//                        readMessage = new String((byte[]) msg.obj, "UTF-8");
-//                        readMessage =  readMessage.substring(0,1);
-//                        //取得傳過來字串的第一個字元，其餘為雜訊
-//                        recieveData += readMessage; //拼湊每次收到的字元成字串
-//                    } catch (UnsupportedEncodingException e) {
-//                        e.printStackTrace();
-//                    }
-//                    ReceiveData.add(recieveData);
-//                    //Toast.makeText(getApplicationContext(), recieveData, Toast.LENGTH_LONG).show();
-//
-//                }
-//
-//                if(msg.what == CONNECTING_STATUS){
-//                    //收到CONNECTING_STATUS 顯示以下訊息
-//                    if(msg.arg1 == 1) {
-//                        Toast.makeText(getApplicationContext(), "成功連線到裝置: " + (String) (msg.obj), Toast.LENGTH_LONG).show();
-//                        connectName=(String) (msg.obj);
-//                    }
-//                    else
-//                        Toast.makeText(getApplicationContext(),"連線失敗，原因: "
-//                                + (String)(msg.obj), Toast.LENGTH_LONG).show();
-//                }
-//            }
-//        };
         if (bluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(), "你的裝置不支援藍芽=  =", Toast.LENGTH_LONG).show();
         }
@@ -169,18 +92,55 @@ public class MainActivity extends AppCompatActivity {
             }else
             {
                 Toast.makeText(getApplicationContext(), "請從選單中「藍芽裝置管理」中連接裝置", Toast.LENGTH_LONG).show();
-               // discover();
+                bt.setupService();
+                bt.startService(BluetoothState.DEVICE_OTHER);
+                discover();
             }
 
         }
 
         requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE,READ_EXTERNAL_STORAGE,BLUETOOTH_ADMIN,BLUETOOTH_SERVICE,ACCESS_FINE_LOCATION}, 1);
-        //mDevicesListView= findViewById(R.id.mDevicesListView);
-       //mDevicesListView.setAdapter(mBTArrayAdapter); // assign model to view
-       //mDevicesListView.setOnItemClickListener(mDeviceClickListener);S
+        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+            public void onDataReceived(byte[] data, String message) {
+                // Do something when data incoming
+                //Log.i("Rcv_Str", message);
+                //Log.i("Rcv_Byte", String.valueOf(uint16(data[0],data[1])));
+                //Toast.makeText(getApplicationContext(), message,
+                        //Toast.LENGTH_SHORT).show();
+                ReceiveData.add(message);
 
-       // listDevices.setAdapter(mBTArrayAdapter); // assign model to view
-        //listDevices.setOnItemClickListener(mDeviceClickListener);
+            }
+        });
+
+        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
+            public void onDeviceConnected(String name, String address) {
+                // Do something when successfully connected
+                Toast.makeText(getApplicationContext(), "Connected to " + name ,
+                        Toast.LENGTH_SHORT).show();
+            }
+
+            public void onDeviceDisconnected() {
+                // Do something when connection was disconnected
+            }
+
+            public void onDeviceConnectionFailed() {
+                // Do something when connection failed
+            }
+        });
+        bt.setBluetoothStateListener(new BluetoothSPP.BluetoothStateListener() {
+            public void onServiceStateChanged(int state) {
+                if(state == BluetoothState.STATE_CONNECTED) {
+                    Log.i("Check", "State : Connected");
+
+                }
+                else if(state == BluetoothState.STATE_CONNECTING)
+                    Log.i("Check", "State : Connecting");
+                else if(state == BluetoothState.STATE_LISTEN)
+                    Log.i("Check", "State : Listen");
+                else if(state == BluetoothState.STATE_NONE)
+                    Log.i("Check", "State : None");
+            }
+        });
 
     }
 
@@ -288,110 +248,12 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     private void connectDevice(String mac,String name) {
-//        new Thread()
-//        {
-//            public void run() {
-//                boolean fail = false;
-//                //取得裝置MAC找到連接的藍芽裝置
-//                BluetoothDevice device = mBTAdapter.getRemoteDevice(mac);
-//
-//                try {
-//                    mBTSocket = createBluetoothSocket(device);
-//                    //建立藍芽socket
-//                } catch (IOException e) {
-//                    fail = true;
-//                    Toast.makeText(getBaseContext(), "Socket creation failed",
-//                            Toast.LENGTH_SHORT).show();
-//                }
-//                // Establish the Bluetooth socket connection.
-//                try {
-//                    mBTSocket.connect(); //建立藍芽連線
-//                } catch (IOException e) {
-//                    try {
-//                        fail = true;
-//                        mBTSocket.close(); //關閉socket
-//                        //開啟執行緒 顯示訊息
-//                        mHandler.obtainMessage(CONNECTING_STATUS, -1, -1)
-//                                .sendToTarget();
-//                    } catch (IOException e2) {
-//                        //insert code to deal with this
-//                        Toast.makeText(getBaseContext(), "Socket creation failed",
-//                                Toast.LENGTH_SHORT).show();
-//                    }
-//                }
-//                if(fail == false) {
-//                    //開啟執行緒用於傳輸及接收資料
-//                    mConnectedThread = new ConnectedThread(mBTSocket);
-//                    mConnectedThread.start();
-//                    //開啟新執行緒顯示連接裝置名稱
-//                    mHandler.obtainMessage(CONNECTING_STATUS, 1, -1, name)
-//                            .sendToTarget();
-//                }
-//            }
-//        }.start();
+        bt.connect(mac);
     }
 
-//    private BluetoothSocket createBluetoothSocket(BluetoothDevice device) throws
-//            IOException {
-//        return  device.createRfcommSocketToServiceRecord(BTMODULEUUID);
-//        //creates secure outgoing connection with BT device using UUID
-//    }
-
-//    private class ConnectedThread extends Thread {
-//        private final BluetoothSocket mmSocket;
-//        private final InputStream mmInStream;
-//        private final OutputStream mmOutStream;
-//
-//        public ConnectedThread(BluetoothSocket socket) {
-//            mmSocket = socket;
-//            InputStream tmpIn = null;
-//            OutputStream tmpOut = null;
-//
-//            // Get the input and output streams, using temp objects because
-//            // member streams are final
-//            try {
-//                tmpIn = socket.getInputStream();
-//                tmpOut = socket.getOutputStream();
-//            } catch (IOException e) {
-//            }
-//
-//            mmInStream = tmpIn;
-//            mmOutStream = tmpOut;
-//        }
-//
-//        public void run() {
-//            byte[] buffer = new byte[1024];  // buffer store for the stream
-//            int bytes; // bytes returned from read()
-//            // Keep listening to the InputStream until an exception occurs
-//            while (true) {
-//                try {
-//                    // Read from the InputStream
-//                    bytes = mmInStream.available();
-//                    if (bytes != 0) {
-//                        bytes = mmInStream.available();
-//                        // how many bytes are ready to be read?
-//                        bytes = mmInStream.read(buffer, 0, bytes);
-//                        // record how many bytes we actually read
-//                        mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-//                                .sendToTarget(); // Send the obtained bytes to the UI activity
-//                    }
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//
-//                    break;
-//                }
-//            }
-//        }
-
-
-        //private void onMessageReceived(String message) {
-            // We received a message! Handle it here.
-            //Toast.makeText(getApplicationContext(), "Received a message! Message was: " + message, Toast.LENGTH_LONG).show(); // Replace context with your context instance.
-           // ReceiveData.add(message);
-           // receivedSize += 1;
-      //  }
 
 
     }
+
 
 

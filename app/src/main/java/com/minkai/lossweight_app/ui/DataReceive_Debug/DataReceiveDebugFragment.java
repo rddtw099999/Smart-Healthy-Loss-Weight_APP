@@ -57,7 +57,7 @@ public class DataReceiveDebugFragment extends Fragment {
                 DataSPS.setText("平均取樣率："+currentSPS+" /sps");
             }
         };
-        startCount=((MainActivity)getActivity()).receivedSize;
+        startCount=((MainActivity)getActivity()).ReceiveData.size();
         return root;
     }
 

@@ -264,11 +264,11 @@ public class RealtimePlotFragment extends Fragment {
 
             timeCounter+=0.1;
 
-            //latestCount=((MainActivity)getActivity()).ReceiveData.size();
-            latestCount=((MainActivity)getActivity()).receivedSize;
+            latestCount=((MainActivity)getActivity()).ReceiveData.size();
+            //latestCount=((MainActivity)getActivity()).receivedSize;
             if(latestCount!=0) {
                 latestData = Integer.valueOf(((MainActivity) getActivity()).ReceiveData.get(latestCount - 1));
-                latestData = (latestData - 500) / 500;
+                latestData = (latestData - 2048) / 2048;
             }
             data.addEntry(new Entry(timeCounter,  latestData) , 0);
             data.notifyDataChanged();

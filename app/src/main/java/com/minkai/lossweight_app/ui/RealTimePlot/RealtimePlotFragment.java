@@ -28,10 +28,15 @@ import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.minkai.lossweight_app.STFT;
+
+import org.jblas.ComplexDoubleMatrix;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -275,6 +280,13 @@ public class RealtimePlotFragment extends Fragment {
             mChart.notifyDataSetChanged();
             mChart.setVisibleXRangeMaximum(10);
             mChart.moveViewToX(data.getEntryCount());
+
+            STFT a=new STFT();
+            ArrayList<String> tempdata = new ArrayList();
+            tempdata=(((MainActivity) getActivity()).ReceiveData);
+            String[] time_domain=tempdata.toArray(new String[tempdata.size()]);
+
+            ComplexDoubleMatrix b=a.stft_single(Arrays.toString(time_domain));
 
         }
     }
